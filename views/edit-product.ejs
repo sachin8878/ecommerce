@@ -1,0 +1,65 @@
+<h1 class="text-center text-danger mt-5"> Update Your Product Here </h1>
+
+   <form action="/update-product?productId=<%= product.id; %>" method="post" enctype="multipart/form-data">
+       <div class="container mt-5">
+         <div class="row">
+            <div class="col-8 offset-2">
+                <div class="card">
+                    <div class="card-header bg-info">
+                        <div class="row">
+                            <div class="col-4 offset-4">
+                                <label class="form-label">Product Title</label>
+                                <input type="text" class="form-control" name="title" value="<%= product.title; %>"/>
+                            </div>
+                        </div>
+                 </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 mb-3 mt-2">
+                                <label class="form-label">Product Image</label>
+                                <input type="file" name="productimage" class="form-control" value="<%= product.image;%>" />
+                            </div>
+                            <div class="col-12 mb-3 mt-2">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" rows="7" name="description"><%= product.description; %></textarea>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Price</label>
+                                <input type="text" class="form-control" name="price" value="<%= product.price; %>"/>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Quantity</label>
+                                <input type="text" class="form-control" name="quantity" value="<%= product.quantity; %>"/>
+                            </div>
+                            <div class="col-12 mb-3 mt-2">
+                                <span>Featured</span>
+                                <div class="form-check">
+                                    <label class="form-check-label"></label>
+                                    <input type="radio" class="form-check-input" name="featured" value="yes" <% if(product.featured=='yes'){%> checked="checked" <%}%>/>Yes
+                                </div>
+                                <div class="form-check">
+                                    <label class="form-check-label"></label>
+                                    <input type="radio" class="form-check-input" name="featured" value="no" <% if(product.featured=='no'){%> checked="checked" <%}%>/>No
+                                </div>
+                            </div>
+                            <div class="col-12 mb-3 mt-2">
+                                <label class="form-label">Category</label>
+                                <select name="category">
+                                    <option>All Categories</option>
+                                    <option value="Mobiles" <% if(product.category=='Mobiles'){%> selected="selected"; <% } %>>Mobiles</option>
+                                    <option value="Computers" <% if(product.category=='Computers'){%> selected="selected"; <% } %>>Computers</option>
+                                    <option value="Electronics"<% if(product.category=='Electronics'){%> selected="selected"; <% } %>>Electronics</option>
+                                    <option value="Kitchen" <% if(product.category=='Kitchen'){%> selected="selected"; <% } %>>Kitchen</option>
+                                    <option value="Fashion" <% if(product.category=='Fashion'){%> selected="selected"; <% } %>>Fashion</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-success" type="submit" value="submit">Update Product</button>
+                    </div>
+                </div>
+            </div>
+         </div>
+       </div>
+   </form>

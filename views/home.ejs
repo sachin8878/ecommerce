@@ -1,0 +1,47 @@
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-10"></div>
+    <div class="col-2">
+        <a href="/create-product" class="btn btn-success">Create Product</a>
+    </div>
+    </div>
+</div>
+
+<div class="container-fluid mt-5">
+    <table class="table table-bordered table-hovered" style="background-color:peru ;">
+        <thead>
+            <tr>
+                <th>Sr. no</th>
+                <th>Title</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Featured</th>
+                <th>Category</th>
+                <th style="width: 150px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for(let i = 0; i < product.length; i++){ %>
+              <tr>
+                <td><%= i + 1; %></td>
+                <td><%= product[i].title;%></td>
+                <td>
+                    <img src="/profile-images/<%= product[i].image; %>" height="200px" width="150px"/>
+                </td>
+                <td><%= product[i].description; %></td>
+                <td><%= product[i].price; %></td>
+                <td><%= product[i].quantity; %></td>
+                <td><%= product[i].featured; %></td>
+                <td><%= product[i].category; %></td>
+                <td>
+                     <a href="/edit-product?productId=<%= product[i].id; %>" class="btn btn-primary">Edit</a>
+                     <a href="/delete-product?productId=<%=product[i].id; %>" class="btn btn-danger">Delete</a>
+                </td>
+              </tr>
+           <% } %>
+        </tbody>
+    </table>
+</div>
