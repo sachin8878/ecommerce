@@ -357,7 +357,7 @@ app.get('/cart', function (req, res) {
     };
     const cartData = {
         userId : req.session.isUserLoggedIn,
-        cartId : req.query.productId,
+        productId : req.query.productId,
     }
     console.log('itemId',cartData);
     data.cartItem = cartData;
