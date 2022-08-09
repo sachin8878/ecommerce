@@ -326,26 +326,46 @@ app.post('/login', function (req, res) {
     const email = req.body.username;
     const password = req.body.password;
 
-    const getSingleUser = `SELECT * FROM users WHERE email= '${email}'AND password= '${password}'`;
+    const getSingleUser = `SELECT * FROM users WHERE email= '${email}'`;
     console.log(getSingleUser);
     connection.query(getSingleUser, function (error, result) {
         if (error) {
             console.log(error);
         } else {
-            console.log( "result :",result);
-            if (result && result.length > 0) {
-                console.log("Data found", result);
-                req.session.status = "Success";
-                req.session.message = "Succcessfullly Logged In";
-                req.session.isUserLoggedIn = result[0].id;
-                    console.log("req.session.isUserLoggedIn",req.session.isUserLoggedIn)
-                res.redirect('/login')
+            console.log("result :", result);
+            if (result.length > 0) {
+                if (result[0].password == password) {
+                    console.log("user verified");
+                    req.session.status = "Success";
+                    req.session.message = "Succcessfullly Logged In";
+                    req.session.isUserLoggedIn = result[0].id;
+                    res.redirect('/');
+
+                } else {
+                    console.log("incorrect password");
+                    req.session.message = "Incorrect password";
+                    res.redirect('/login')
+                }
             } else {
-                console.log("No Data found");
-                req.session.status = 'Error';
-                req.session.message = "Invalid Credentials";
+                console.log("email not found");
+                req.session.message = "Invalid email";
                 res.redirect('/login')
             }
+
+
+            // if (result && result.length > 0) {
+            //     console.log("Data found", result);
+            //     req.session.status = "Success";
+            //     req.session.message = "Succcessfullly Logged In";
+            //     req.session.isUserLoggedIn = result[0].id;
+            //         console.log("req.session.isUserLoggedIn",req.session.isUserLoggedIn)
+            //     res.redirect('/login')
+            // } else {
+            //     console.log("No Data found");
+            //     req.session.status = 'Error';
+            //     req.session.message = "Invalid Credentials";
+            //     res.redirect('/login')
+            // }
         }
     })
 });
@@ -356,10 +376,10 @@ app.get('/cart', function (req, res) {
         pageName: 'cart'
     };
     const cartData = {
-        userId : req.session.isUserLoggedIn,
-        productId : req.query.productId,
+        userId: req.session.isUserLoggedIn,
+        productId: req.query.productId,
     }
-    console.log('itemId',cartData);
+    console.log('itemId', cartData);
     data.cartItem = cartData;
     res.render('template', data)
 });
