@@ -321,55 +321,50 @@ app.get('/login', function (req, res) {
     res.render('template', data)
 });
 
-app.post('/login', function (req, res) {
+app.post('/login', async function (req, res) {
     console.log(req.body);
-    const email = req.body.username;
-    const password = req.body.password;
+    try {
+        const email = req.body.username;
+        const password = req.body.password;
+        await userLogin(email,password);
+    } catch (error) {
+        console.log(error);
+    }
 
-    const getSingleUser = `SELECT * FROM users WHERE email= '${email}'`;
-    console.log(getSingleUser);
-    connection.query(getSingleUser, function (error, result) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log("result :", result);
-            if (result.length > 0) {
-                if (result[0].password == password) {
-                    console.log("user verified");
-                    req.session.status = "Success";
-                    req.session.message = "Succcessfullly Logged In";
-                    req.session.isUserLoggedIn = result[0].id;
-                    res.redirect('/');
-
+    async function userLogin(email,password){
+        return new Promise (function(resolve, reject){
+            const getSingleUser = `SELECT * FROM users WHERE email= '${email}'`;
+            console.log(getSingleUser);
+            connection.query(getSingleUser, function (error, result) {
+                if (error) {
+                    reject(error);
                 } else {
-                    console.log("incorrect password");
-                    req.session.message = "Incorrect password";
-                    res.redirect('/login')
+                    resolve(result);
+                    if (result.length > 0) {
+                        if (result[0].password == password) {
+                            console.log("user verified");
+                            req.session.message = "Succcessfullly Logged In";
+                            req.session.isUserLoggedIn = result[0].id;
+                            res.redirect('/');
+        
+                        } else {
+                            console.log("incorrect password");
+                            req.session.status = "Error"
+                            req.session.message = "Incorrect password";
+                            res.redirect('/login')
+                        }
+                    } else {
+                        console.log("email not found");
+                        req.session.status = "Error"
+                        req.session.message = "Invalid email";
+                        res.redirect('/login')
+                    }
                 }
-            } else {
-                console.log("email not found");
-                req.session.message = "Invalid email";
-                res.redirect('/login')
-            }
-
-
-            // if (result && result.length > 0) {
-            //     console.log("Data found", result);
-            //     req.session.status = "Success";
-            //     req.session.message = "Succcessfullly Logged In";
-            //     req.session.isUserLoggedIn = result[0].id;
-            //         console.log("req.session.isUserLoggedIn",req.session.isUserLoggedIn)
-            //     res.redirect('/login')
-            // } else {
-            //     console.log("No Data found");
-            //     req.session.status = 'Error';
-            //     req.session.message = "Invalid Credentials";
-            //     res.redirect('/login')
-            // }
-        }
-    })
+            })
+        });
+    }
 });
-
+    
 app.get('/cart', function (req, res) {
     let data = {
         title: 'Cart List',
