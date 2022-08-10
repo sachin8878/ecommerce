@@ -331,9 +331,9 @@ app.post('/login', async function (req, res) {
         console.log(error);
     }
 
-    async function userLogin(email,password){
+    async function userLogin(emailId,password){
         return new Promise (function(resolve, reject){
-            const getSingleUser = `SELECT * FROM users WHERE email= '${email}'`;
+            const getSingleUser = `SELECT * FROM users WHERE email= '${emailId}'`;
             console.log(getSingleUser);
             connection.query(getSingleUser, function (error, result) {
                 if (error) {
