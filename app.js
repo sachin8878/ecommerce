@@ -40,12 +40,27 @@ connection.connect(function (error) {
     }
 });
 
-app.get('/', async function (req, res) {
+app.get('/', validateUser, async function (req, res) {
     try {
         let data = {
             title: 'Products',
-            pageName: 'home'
+            pageName: 'home',
+            status:'',
+            message:'',
+            userLoggedIn: false
         };
+        if(req.session.isUserLoggedIn){
+            data.userLoggedIn = true;
+        }
+        if(req.session.status){
+            data.status = req.session.status;
+            delete  req.session.status;
+        }
+        if(req.session.message){
+            data.message = req.session.message;
+            delete  req.session.message;
+        }
+
         let product = await getProducts();
         data.product = product;
         res.render('template', data)
@@ -68,11 +83,25 @@ async function getProducts() {
     })
 }
 
-app.get('/create-product', function (req, res) {
+app.get('/create-product',validateUser, function (req, res) {
     let data = {
         title: 'Create Product',
-        pageName: 'create-product'
+        pageName: 'create-product',
+        status:'',
+        message:'',
+        userLoggedIn: false
     };
+    if (req.session.isUserLoggedIn) {
+        data.userLoggedIn = true;
+    }
+    if (req.session.status) {
+        data.status = req.session.status;
+        delete req.session.status;
+    }
+    if (req.session.message) {
+        data.message = req.session.message;
+        delete req.session.message;
+    }
     res.render('template', data)
 });
 
@@ -134,11 +163,25 @@ async function insertProduct(productData) {
     })
 }
 
-app.get('/edit-product', async function (req, res) {
+app.get('/edit-product',validateUser, async function (req, res) {
     try {
         let data = {
             title: 'Edit Product',
-            pageName: 'edit-product'
+            pageName: 'edit-product',
+            status:'',
+            message:'',
+            userLoggedIn: false
+        }
+        if (req.session.isUserLoggedIn) {
+            data.userLoggedIn = true;
+        }
+        if (req.session.status) {
+            data.status = req.session.status;
+            delete req.session.status;
+        }
+        if (req.session.message) {
+            data.message = req.session.message;
+            delete req.session.message;
         }
         const proId = req.query.productId;
         let Allproduct = await getAllProducts(proId);
@@ -240,10 +283,24 @@ async function deleteProducts(proId) {
     })
 }
 
-app.get('/shop', function (req, res) {
+app.get('/shop',validateUser, function (req, res) {
     let data = {
         title: 'Shop',
-        pageName: 'shop'
+        pageName: 'shop',
+        status:'',
+        message:'',
+        userLoggedIn: false
+    };
+    if (req.session.isUserLoggedIn) {
+        data.userLoggedIn = true;
+    }
+    if (req.session.status) {
+        data.status = req.session.status;
+        delete req.session.status;
+    }
+    if (req.session.message) {
+        data.message = req.session.message;
+        delete req.session.message;
     }
     const getProduct = `SELECT * FROM products`;
     connection.query(getProduct, function (error, result) {
@@ -257,11 +314,15 @@ app.get('/shop', function (req, res) {
     })
 });
 
-app.get('/register', function (req, res) {
+app.get('/register',backDoorEntry, function (req, res) {
     let data = {
         title: 'Registration',
-        pageName: 'register'
+        pageName: 'register',
+        userLoggedIn: false
     };
+    if(req.session.isUserLoggedIn){
+        data.userLoggedIn = true;
+    }
     res.render('template', data)
 });
 
@@ -303,12 +364,13 @@ app.post('/create-user', function (req, res) {
     })
 });
 
-app.get('/login', function (req, res) {
+app.get('/login',backDoorEntry, function (req, res) {
     let data = {
         title: 'Login Portal',
         pageName: 'login',
         status: '',
-        message: ''
+        message: '',
+        userLoggedIn: false
     };
     if (req.session.status) {
         data.status = req.session.status;
@@ -365,11 +427,25 @@ app.post('/login', async function (req, res) {
     }
 });
     
-app.get('/cart', function (req, res) {
+app.get('/cart',validateUser, function (req, res) {
     let data = {
         title: 'Cart List',
-        pageName: 'cart'
+        pageName: 'cart',
+        status:'',
+        message:'',
+        userLoggedIn: false
     };
+    if (req.session.isUserLoggedIn) {
+        data.userLoggedIn = true;
+    }
+    if (req.session.status) {
+        data.status = req.session.status;
+        delete req.session.status;
+    }
+    if (req.session.message) {
+        data.message = req.session.message;
+        delete req.session.message;
+    }
     const cartData = {
         userId: req.session.isUserLoggedIn,
         productId: req.query.productId,
@@ -378,6 +454,31 @@ app.get('/cart', function (req, res) {
     data.cartItem = cartData;
     res.render('template', data)
 });
+
+app.get('/logout', function(req, res){
+    if(req.session.isUserLoggedIn){
+        delete req.session.isUserLoggedIn;
+    }
+    res.redirect('/login');
+});
+
+function validateUser(req, res, next){
+    if(!req.session.isUserLoggedIn){
+        req.session.status = 'Error';
+        req.session.message = "Session Expired";
+        res.redirect('/login');
+    }else{
+        next();
+    }
+}
+
+function backDoorEntry(req, res, next){
+    if(req.session.isUserLoggedIn){
+        res.redirect('/');
+    }else{
+        next();
+    }
+}
 
 const port = 5000;
 app.listen(port, function () {
