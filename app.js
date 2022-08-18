@@ -283,36 +283,46 @@ async function deleteProducts(proId) {
     })
 }
 
-app.get('/shop',validateUser, function (req, res) {
-    let data = {
-        title: 'Shop',
-        pageName: 'shop',
-        status:'',
-        message:'',
-        userLoggedIn: false
-    };
-    if (req.session.isUserLoggedIn) {
-        data.userLoggedIn = true;
-    }
-    if (req.session.status) {
-        data.status = req.session.status;
-        delete req.session.status;
-    }
-    if (req.session.message) {
-        data.message = req.session.message;
-        delete req.session.message;
-    }
-    const getProduct = `SELECT * FROM products`;
-    connection.query(getProduct, function (error, result) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log(result);
-            data.product = result;
-            res.render('template', data)
+app.get('/shop',validateUser,async function (req, res) {
+    try {
+        let data = {
+            title: 'Shop',
+            pageName: 'shop',
+            status:'',
+            message:'',
+            userLoggedIn: false
+        };
+        if (req.session.isUserLoggedIn) {
+            data.userLoggedIn = true;
         }
-    })
+        if (req.session.status) {
+            data.status = req.session.status;
+            delete req.session.status;
+        }
+        if (req.session.message) {
+            data.message = req.session.message;
+            delete req.session.message;
+        }
+       let products = await getProduct();
+       data.product = products;
+       res.render('template', data);
+    } catch (error) {
+        console.log(error);
+    }
 });
+
+async function getProduct(){
+    return new Promise(function(resolve,reject){
+        const getProduct = `SELECT * FROM products`;
+        connection.query(getProduct, function(error, result){
+            if(error){
+                reject(error);
+            }else{
+                resolve(result);
+            }
+        })
+    })
+}
 
 app.get('/register',backDoorEntry, function (req, res) {
     let data = {
