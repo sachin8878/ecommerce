@@ -338,13 +338,7 @@ app.get('/register',backDoorEntry, function (req, res) {
 
 app.post('/create-user', function (req, res) {
     console.log(req.body);
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const userEmail = req.body.userEmail;
-    const contact = req.body.contact;
-    const gender = req.body.gender;
-    const aboutAuthor = req.body.aboutAuthor;
-    const password = req.body.password;
+    const {firstName,lastName,userEmail,contact,gender,aboutAuthor,password} = req.body;
     console.log(req.files);
     const profileImage = req.files.authorProfile;
     const imageName = profileImage.name;
