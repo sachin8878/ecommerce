@@ -28,7 +28,7 @@ const dbConfig = {
     host: 'localhost',
     user: 'root',
     password: 'Admin123',
-    database: 'project'
+    database: 'ecommerce'
 }
 
 const connection = mysql.createConnection(dbConfig);
