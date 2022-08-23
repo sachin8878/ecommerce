@@ -59,7 +59,7 @@ app.get('/', validateUser, async function (req, res) {
         if(req.session.message){
             data.message = req.session.message;
             delete  req.session.message;
-        }
+        }   
 
         let product = await getProducts();
         data.product = product;
