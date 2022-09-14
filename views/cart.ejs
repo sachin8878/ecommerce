@@ -1,19 +1,26 @@
-
 <div class="container-fluid mt-5">
     <table class="table table-bordered table-hovered" style="background-color:peru ;">
         <thead>
             <tr>
                 <th>Sr. no</th>
-                <th>Product Id</th>
-                <th>User Id</th>            
+                <th>Title</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-              <tr>
-                <td>1</td>
-                <td><%= cartItem.productId;%></td>
-                <td><%= cartItem.userId;%></td>
-              </tr>
+            <% if(items) { for(let i=0; i < items.length; i++){ %>
+                <tr>
+                    <td><%= i+1; %></td>
+                    <td><%= items[i].title; %></td>
+                    <td><%= items[i].category; %></td>
+                    <td><%= items[i].price; %></td>
+                    <td>
+                        <a href="/remove-from-cart?pro_id=<%= items[i].id; %>" class="btn btn-primary">Remove</a>
+                    </td>
+                </tr>
+            <% } } %>
         </tbody>
     </table>
 </div>

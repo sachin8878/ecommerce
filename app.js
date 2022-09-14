@@ -4,12 +4,12 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const fileUpload = require('express-fileupload');
 const expressSession = require('express-session');
+const cookieParser = require('cookie-parser');
 
 app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(fileUpload());
-
 const sessionConfig = {
     secret: 'Ecommerce',
     resave: false,
@@ -21,8 +21,8 @@ const sessionConfig = {
         maxAge: 1000 * 60 * 60 * 60 * 24
     }
 };
-
 app.use(expressSession(sessionConfig));
+app.use(cookieParser());
 
 const dbConfig = {
     host: 'localhost',
@@ -45,21 +45,21 @@ app.get('/', validateUser, async function (req, res) {
         let data = {
             title: 'Products',
             pageName: 'home',
-            status:'',
-            message:'',
+            status: '',
+            message: '',
             userLoggedIn: false
         };
-        if(req.session.isUserLoggedIn){
+        if (req.session.isUserLoggedIn) {
             data.userLoggedIn = true;
         }
-        if(req.session.status){
+        if (req.session.status) {
             data.status = req.session.status;
-            delete  req.session.status;
+            delete req.session.status;
         }
-        if(req.session.message){
+        if (req.session.message) {
             data.message = req.session.message;
-            delete  req.session.message;
-        }   
+            delete req.session.message;
+        }
 
         let product = await getProducts();
         data.product = product;
@@ -83,12 +83,12 @@ async function getProducts() {
     })
 }
 
-app.get('/create-product',validateUser, function (req, res) {
+app.get('/create-product', validateUser, function (req, res) {
     let data = {
         title: 'Create Product',
         pageName: 'create-product',
-        status:'',
-        message:'',
+        status: '',
+        message: '',
         userLoggedIn: false
     };
     if (req.session.isUserLoggedIn) {
@@ -130,7 +130,7 @@ app.post('/create-product', async function (req, res) {
         let imageUpload = await uploadImage(productImage, imageNewName);
         let productinsert = await insertProduct(productData);
 
-        res.redirect('/');
+        res.redirect('/shop');
 
     } catch (error) {
         console.log(error);
@@ -163,13 +163,13 @@ async function insertProduct(productData) {
     })
 }
 
-app.get('/edit-product',validateUser, async function (req, res) {
+app.get('/edit-product', validateUser, async function (req, res) {
     try {
         let data = {
             title: 'Edit Product',
             pageName: 'edit-product',
-            status:'',
-            message:'',
+            status: '',
+            message: '',
             userLoggedIn: false
         }
         if (req.session.isUserLoggedIn) {
@@ -283,13 +283,13 @@ async function deleteProducts(proId) {
     })
 }
 
-app.get('/shop',validateUser,async function (req, res) {
+app.get('/shop', validateUser, async function (req, res) {
     try {
         let data = {
             title: 'Shop',
             pageName: 'shop',
-            status:'',
-            message:'',
+            status: '',
+            message: '',
             userLoggedIn: false
         };
         if (req.session.isUserLoggedIn) {
@@ -303,34 +303,34 @@ app.get('/shop',validateUser,async function (req, res) {
             data.message = req.session.message;
             delete req.session.message;
         }
-       let products = await getProduct();
-       data.product = products;
-       res.render('template', data);
+        let products = await getProduct();
+        data.product = products;
+        res.render('template', data);
     } catch (error) {
         console.log(error);
     }
 });
 
-async function getProduct(){
-    return new Promise(function(resolve,reject){
+async function getProduct() {
+    return new Promise(function (resolve, reject) {
         const getProduct = `SELECT * FROM products`;
-        connection.query(getProduct, function(error, result){
-            if(error){
+        connection.query(getProduct, function (error, result) {
+            if (error) {
                 reject(error);
-            }else{
+            } else {
                 resolve(result);
             }
         })
     })
 }
 
-app.get('/register',backDoorEntry, function (req, res) {
+app.get('/register', backDoorEntry, function (req, res) {
     let data = {
         title: 'Registration',
         pageName: 'register',
         userLoggedIn: false
     };
-    if(req.session.isUserLoggedIn){
+    if (req.session.isUserLoggedIn) {
         data.userLoggedIn = true;
     }
     res.render('template', data)
@@ -338,7 +338,7 @@ app.get('/register',backDoorEntry, function (req, res) {
 
 app.post('/create-user', function (req, res) {
     console.log(req.body);
-    const {firstName,lastName,userEmail,contact,gender,aboutAuthor,password} = req.body;
+    const { firstName, lastName, userEmail, contact, gender, aboutAuthor, password } = req.body;
     console.log(req.files);
     const profileImage = req.files.authorProfile;
     const imageName = profileImage.name;
@@ -368,7 +368,7 @@ app.post('/create-user', function (req, res) {
     })
 });
 
-app.get('/login',backDoorEntry, function (req, res) {
+app.get('/login', backDoorEntry, function (req, res) {
     let data = {
         title: 'Login Portal',
         pageName: 'login',
@@ -392,13 +392,13 @@ app.post('/login', async function (req, res) {
     try {
         const email = req.body.username;
         const password = req.body.password;
-        await userLogin(email,password);
+        await userLogin(email, password);
     } catch (error) {
         console.log(error);
     }
 
-    async function userLogin(emailId,password){
-        return new Promise (function(resolve, reject){
+    async function userLogin(emailId, password) {
+        return new Promise(function (resolve, reject) {
             const getSingleUser = `SELECT * FROM users WHERE email= '${emailId}'`;
             console.log(getSingleUser);
             connection.query(getSingleUser, function (error, result) {
@@ -412,7 +412,7 @@ app.post('/login', async function (req, res) {
                             req.session.message = "Succcessfullly Logged In";
                             req.session.isUserLoggedIn = result[0].id;
                             res.redirect('/');
-        
+
                         } else {
                             console.log("incorrect password");
                             req.session.status = "Error"
@@ -430,56 +430,110 @@ app.post('/login', async function (req, res) {
         });
     }
 });
-    
-app.get('/cart',validateUser, function (req, res) {
-    let data = {
-        title: 'Cart List',
-        pageName: 'cart',
-        status:'',
-        message:'',
-        userLoggedIn: false
-    };
-    if (req.session.isUserLoggedIn) {
-        data.userLoggedIn = true;
+
+app.get('/add-to-cart', function (req, res) {
+    if (req.query.productId) {
+        const productId = req.query.productId;
+        let productIds = [];
+        if (req.cookies.productIds) {
+            productIds = req.cookies.productIds;
+        }
+        productIds.push(productId);
+        productIds = [...new Set(productIds)]
+        res.cookie('productIds', productIds);
     }
-    if (req.session.status) {
-        data.status = req.session.status;
-        delete req.session.status;
-    }
-    if (req.session.message) {
-        data.message = req.session.message;
-        delete req.session.message;
-    }
-    const cartData = {
-        userId: req.session.isUserLoggedIn,
-        productId: req.query.productId,
-    }
-    console.log('itemId', cartData);
-    data.cartItem = cartData;
-    res.render('template', data)
+    res.redirect('/cart');
 });
 
-app.get('/logout', function(req, res){
-    if(req.session.isUserLoggedIn){
+app.get('/cart', validateUser, async function (req, res) {
+    try {
+        let data = {
+            title: 'Cart List',
+            pageName: 'cart',
+            status: '',
+            message: '',
+            userLoggedIn: false,
+            items: []
+        };
+        if (req.session.isUserLoggedIn) {
+            data.userLoggedIn = true;
+        }
+        if (req.session.status) {
+            data.status = req.session.status;
+            delete req.session.status;
+        }
+        if (req.session.message) {
+            data.message = req.session.message;
+            delete req.session.message;
+        }
+        if (req.cookies.productIds && req.cookies.productIds.length > 0) {
+            const proIds = req.cookies.productIds;
+            console.log("req.cookies.productIds", req.cookies.productIds);
+            console.log("proIds", proIds);
+            data.items = await getProductByIds(proIds);
+        }
+        console.log("data", data);
+        res.render('template', data);
+    } catch (error) {
+        console.log("******** error **** :::", error);
+    }
+});
+
+function getProductByIds(proIds) {
+    return new Promise(function (resolve, reject) {
+        proIds = proIds.toString(',');
+        let getProductByIdsQry = `SELECT * FROM products WHERE id IN(${proIds})`;
+        connection.query(getProductByIdsQry, function (error, result) {
+            if (error) {
+                console.log("Database Query Error ::: ", error);
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+}
+
+app.get('/logout', function (req, res) {
+    if (req.session.isUserLoggedIn) {
         delete req.session.isUserLoggedIn;
     }
     res.redirect('/login');
 });
 
-function validateUser(req, res, next){
-    if(!req.session.isUserLoggedIn){
+/** 
+ * To remove products from cart
+ */
+app.get('/remove-from-cart', function(req, res){
+    console.log("req.query", req.query);
+    const productId = req.query.pro_id;
+    console.log("productId", productId);
+    if(req.cookies.productIds){
+        let productIds = req.cookies.productIds;
+        console.log("Before productIds", productIds);
+        let index = productIds.indexOf(productId);
+        productIds.splice(index, 1); 
+        res.cookie('productIds', productIds);
+        console.log("After productIds", productIds);
+        console.log("index", index);
+    }
+    res.redirect('/cart');
+});
+
+function validateUser(req, res, next) {
+    if (!req.session.isUserLoggedIn) {
         req.session.status = 'Error';
         req.session.message = "Session Expired";
         res.redirect('/login');
-    }else{
+    } else {
         next();
     }
 }
 
-function backDoorEntry(req, res, next){
-    if(req.session.isUserLoggedIn){
+function backDoorEntry(req, res, next) {
+    if (req.session.isUserLoggedIn) {
         res.redirect('/');
-    }else{
+    } else {
         next();
     }
 }
