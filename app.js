@@ -129,7 +129,8 @@ app.post('/create-product', async function (req, res) {
 
         let imageUpload = await uploadImage(productImage, imageNewName);
         let productinsert = await insertProduct(productData);
-
+        req.session.status = "Success";
+        req.session.message = "Product Created";
         res.redirect('/shop');
 
     } catch (error) {
@@ -238,6 +239,8 @@ app.post('/update-product', async function (req, res) {
             let imageUpload = await uploadImage(productImage, imageNewName);
         }
         await updateProduct(proData);
+        req.session.status = "Success";
+        req.session.message = "Product Has Been Updated";
         res.redirect('/');
 
     } catch (error) {
@@ -265,6 +268,7 @@ app.get('/delete-product', async function (req, res) {
     try {
         const proId = req.query.productId;
         let deleteproduct = await deleteProducts(proId);
+        req.session.message = "Product has been deleted";
         res.redirect('/');
     } catch (error) {
         console.log(error);
@@ -504,15 +508,15 @@ app.get('/logout', function (req, res) {
 /** 
  * To remove products from cart
  */
-app.get('/remove-from-cart', function(req, res){
+app.get('/remove-from-cart', function (req, res) {
     console.log("req.query", req.query);
     const productId = req.query.pro_id;
     console.log("productId", productId);
-    if(req.cookies.productIds){
+    if (req.cookies.productIds) {
         let productIds = req.cookies.productIds;
         console.log("Before productIds", productIds);
         let index = productIds.indexOf(productId);
-        productIds.splice(index, 1); 
+        productIds.splice(index, 1);
         res.cookie('productIds', productIds);
         console.log("After productIds", productIds);
         console.log("index", index);
